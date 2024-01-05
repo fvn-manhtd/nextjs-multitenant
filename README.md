@@ -16,3 +16,7 @@ npx prisma generate
 ```
 npx prisma migrate dev --name init
 ```
+3. Docker
+```
+docker-compose up -d
+```
