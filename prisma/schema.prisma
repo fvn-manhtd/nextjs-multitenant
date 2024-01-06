@@ -11,10 +11,9 @@ datasource db {
 }
 
 model Tenants {
-  id        String   @id @map("id")
-  data      Json?
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  id        String    @id @default(dbgenerated()) @map("id")
+  createdAt DateTime? @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
 
   domains               Domains[]
   admins                Admins[]
@@ -26,11 +25,11 @@ model Tenants {
 }
 
 model Domains {
-  id        Int      @id @default(autoincrement()) @map("id")
-  domain    String   @unique @map("domain")
-  tenantId  String   @map("tenant_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  id        String    @id @default(dbgenerated()) @map("id")
+  domain    String    @unique @map("domain")
+  tenantId  String    @map("tenant_id")
+  createdAt DateTime? @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
 
   tenant Tenants @relation(fields: [tenantId], references: [id])
 
@@ -38,28 +37,29 @@ model Domains {
 }
 
 model Admins {
-  id         Int      @id @default(autoincrement()) @map("id")
-  tenantId   String   @map("tenant_id")
-  name       String   @map("name")
-  email      String   @unique @map("email")
-  password   String   @map("password")
-  created_at DateTime @default(now()) @map("created_at")
-  updated_at DateTime @default(now()) @updatedAt @map("updated_at")
+  id        String    @id @default(dbgenerated()) @map("id")
+  tenantId  String    @map("tenant_id")
+  name      String    @map("name")
+  email     String    @unique @map("email")
+  password  String    @map("password")  
+  status    Boolean   @default(false) @map("status")
+  createdAt DateTime? @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
 
   tenant         Tenants         @relation(fields: [tenantId], references: [id])
-  admin_tokens   AdminTokens[]
-  admin_profiles AdminProfiles[]
+  adminTokens   AdminTokens[]
+  adminProfiles AdminProfiles[]
 
   @@map("admins")
 }
 
 model AdminTokens {
-  id         Int      @id @default(autoincrement()) @map("id")
-  adminId    Int      @map("admin_id")
-  token      String   @map("token")
-  expire_at  DateTime @map("expire_at")
-  created_at DateTime @default(now()) @map("created_at")
-  updated_at DateTime @default(now()) @updatedAt @map("updated_at")
+  id        String    @id @default(dbgenerated()) @map("id")
+  adminId   String    @map("admin_id")
+  token     String    @map("token")
+  expireAt  DateTime  @map("expire_at")
+  createdAt DateTime? @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
 
   admin Admins @relation(fields: [adminId], references: [id])
 
@@ -67,8 +67,8 @@ model AdminTokens {
 }
 
 model AdminProfiles {
-  id          Int      @id @default(autoincrement()) @map("id")
-  adminId     Int      @map("admin_id")
+  id          String   @id @default(dbgenerated()) @map("id")
+  adminId     String   @map("admin_id")
   companyName String   @map("company_name")
   logo        String   @map("logo")
   website     String   @map("website")
@@ -86,14 +86,14 @@ model AdminProfiles {
 }
 
 model WorkingTimes {
-  id       Int    @id @default(autoincrement()) @map("id")
+  id       String @id @default(dbgenerated()) @map("id")
   tenantId String @map("tenant_id")
 
   startTime DateTime @map("start_time")
   endTime   DateTime @map("end_time")
 
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime? @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
 
   tenant Tenants @relation(fields: [tenantId], references: [id])
 
@@ -101,11 +101,11 @@ model WorkingTimes {
 }
 
 model ExceptionSettingTimes {
-  id        Int      @id @default(autoincrement()) @map("id")
-  tenantId  String   @map("tenant_id")
-  hours     Json     @map("hours")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id        String    @id @default(dbgenerated()) @map("id")
+  tenantId  String    @map("tenant_id")
+  hours     Json      @map("hours")
+  createdAt DateTime? @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
 
   tenant Tenants @relation(fields: [tenantId], references: [id])
 
@@ -113,26 +113,57 @@ model ExceptionSettingTimes {
 }
 
 model TimeSlots {
-  id           Int            @id @default(autoincrement()) @map("id")
+  id           String         @id @default(dbgenerated()) @map("id")
   startTime    DateTime       @map("start_time")
   endTime      DateTime       @map("end_time")
-  createdAt    DateTime       @default(now()) @map("created_at")
-  updatedAt    DateTime       @updatedAt @map("updated_at")
+  createdAt    DateTime?      @map("created_at")
+  updatedAt    DateTime?      @updatedAt @map("updated_at")
   reservations Reservations[]
 
   @@map("time_slots")
 }
 
 model Reservations {
-  id          Int      @id @default(autoincrement()) @map("id")
-  tenantId    String   @map("tenant_id")
-  timeSlotId  Int      @map("time_slot_id")
-  phoneNumber String   @map("tel")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id          String    @id @default(dbgenerated()) @map("id")
+  tenantId    String    @map("tenant_id")
+  timeSlotId  String    @map("time_slot_id")
+  phoneNumber String    @map("tel")
+  createdAt   DateTime? @map("created_at")
+  updatedAt   DateTime? @updatedAt @map("updated_at")
 
   tenant   Tenants   @relation(fields: [tenantId], references: [id])
   timeSlot TimeSlots @relation(fields: [timeSlotId], references: [id])
 
   @@map("reservations")
+}
+
+model Subscriptions {
+  id           Int       @id @default(autoincrement())
+  adminId       String    @map("admin_id")
+  name         String    @map("name")
+  stripeId     String    @unique @map("stripe_id")
+  stripeStatus String    @map("stripe_status")
+  stripePrice  String?   @map("stripe_price")
+  quantity     Int?      @map("quantity")
+  trialEndsAt  DateTime? @map("trial_ends_at")
+  endsAt       DateTime? @map("ends_at")
+  createdAt    DateTime? @map("created_at")
+  updatedAt    DateTime? @updatedAt @map("updated_at")
+
+  @@index([adminId, stripeStatus], name: "subscriptions_user_id_stripe_status_index")
+  @@map("subscriptions")
+}
+
+model SubscriptionItems {
+  id             Int       @id @default(autoincrement())
+  subscriptionId Int       @map("subscription_id")
+  stripeId       String    @unique @map("stripe_id")
+  stripeProduct  String    @map("stripe_product")
+  stripePrice    String    @map("stripe_price")
+  quantity       Int?      @map("quantity")
+  createdAt      DateTime? @map("created_at")
+  updatedAt      DateTime? @updatedAt @map("updated_at")
+
+  @@index([subscriptionId, stripePrice], name: "subscription_items_subscription_id_stripe_price_unique")
+  @@map("subscription_items")
 }

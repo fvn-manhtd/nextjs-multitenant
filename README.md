@@ -15,7 +15,11 @@ npx prisma generate
 2. Create Migration
 ```
 npx prisma migrate dev --name init
+
+npx prisma format
 ```
+
+
 3. Docker
 ```
 docker-compose up -d
