@@ -10,9 +10,129 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
-  token String @unique
+model Tenants {
+  id        String   @id @map("id")
+  data      Json?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  domains               Domains[]
+  admins                Admins[]
+  workingTimes          WorkingTimes[]
+  exceptionSettingTimes ExceptionSettingTimes[]
+  reservations          Reservations[]
+
+  @@map("tenants")
+}
+
+model Domains {
+  id        Int      @id @default(autoincrement()) @map("id")
+  domain    String   @unique @map("domain")
+  tenantId  String   @map("tenant_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  tenant Tenants @relation(fields: [tenantId], references: [id])
+
+  @@map("domains")
+}
+
+model Admins {
+  id         Int      @id @default(autoincrement()) @map("id")
+  tenantId   String   @map("tenant_id")
+  name       String   @map("name")
+  email      String   @unique @map("email")
+  password   String   @map("password")
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @default(now()) @updatedAt @map("updated_at")
+
+  tenant         Tenants         @relation(fields: [tenantId], references: [id])
+  admin_tokens   AdminTokens[]
+  admin_profiles AdminProfiles[]
+
+  @@map("admins")
+}
+
+model AdminTokens {
+  id         Int      @id @default(autoincrement()) @map("id")
+  adminId    Int      @map("admin_id")
+  token      String   @map("token")
+  expire_at  DateTime @map("expire_at")
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @default(now()) @updatedAt @map("updated_at")
+
+  admin Admins @relation(fields: [adminId], references: [id])
+
+  @@map("admin_tokens")
+}
+
+model AdminProfiles {
+  id          Int      @id @default(autoincrement()) @map("id")
+  adminId     Int      @map("admin_id")
+  companyName String   @map("company_name")
+  logo        String   @map("logo")
+  website     String   @map("website")
+  prefecture  String   @map("prefecture")
+  address1    String   @map("address1")
+  address2    String   @map("address2")
+  tel         String   @map("tel")
+  note        String   @map("note")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  admin Admins @relation(fields: [adminId], references: [id])
+
+  @@map("admin_profiles")
+}
+
+model WorkingTimes {
+  id       Int    @id @default(autoincrement()) @map("id")
+  tenantId String @map("tenant_id")
+
+  startTime DateTime @map("start_time")
+  endTime   DateTime @map("end_time")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  tenant Tenants @relation(fields: [tenantId], references: [id])
+
+  @@map("working_times")
+}
+
+model ExceptionSettingTimes {
+  id        Int      @id @default(autoincrement()) @map("id")
+  tenantId  String   @map("tenant_id")
+  hours     Json     @map("hours")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  tenant Tenants @relation(fields: [tenantId], references: [id])
+
+  @@map("exception_setting_times")
+}
+
+model TimeSlots {
+  id           Int            @id @default(autoincrement()) @map("id")
+  startTime    DateTime       @map("start_time")
+  endTime      DateTime       @map("end_time")
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @updatedAt @map("updated_at")
+  reservations Reservations[]
+
+  @@map("time_slots")
+}
+
+model Reservations {
+  id          Int      @id @default(autoincrement()) @map("id")
+  tenantId    String   @map("tenant_id")
+  timeSlotId  Int      @map("time_slot_id")
+  phoneNumber String   @map("tel")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  tenant   Tenants   @relation(fields: [tenantId], references: [id])
+  timeSlot TimeSlots @relation(fields: [timeSlotId], references: [id])
+
+  @@map("reservations")
 }
