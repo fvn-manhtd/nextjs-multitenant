@@ -37,16 +37,17 @@ model Domains {
 }
 
 model Admins {
-  id        String    @id @default(dbgenerated()) @map("id")
-  tenantId  String    @map("tenant_id")
-  name      String    @map("name")
-  email     String    @unique @map("email")
-  password  String    @map("password")  
-  status    Boolean   @default(false) @map("status")
-  createdAt DateTime? @map("created_at")
-  updatedAt DateTime? @updatedAt @map("updated_at")
+  id         String    @id @default(dbgenerated()) @map("id")
+  tenantId   String    @map("tenant_id")
+  name       String    @map("name")
+  email      String    @unique @map("email")
+  password   String    @map("password")
+  status     Boolean   @default(false) @map("status")
+  verifiedAt DateTime? @map("verified_at")
+  createdAt  DateTime? @map("created_at")
+  updatedAt  DateTime? @updatedAt @map("updated_at")
 
-  tenant         Tenants         @relation(fields: [tenantId], references: [id])
+  tenant        Tenants         @relation(fields: [tenantId], references: [id])
   adminTokens   AdminTokens[]
   adminProfiles AdminProfiles[]
 
@@ -57,7 +58,6 @@ model AdminTokens {
   id        String    @id @default(dbgenerated()) @map("id")
   adminId   String    @map("admin_id")
   token     String    @map("token")
-  expireAt  DateTime  @map("expire_at")
   createdAt DateTime? @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
 
@@ -139,7 +139,7 @@ model Reservations {
 
 model Subscriptions {
   id           Int       @id @default(autoincrement())
-  adminId       String    @map("admin_id")
+  adminId      String    @map("admin_id")
   name         String    @map("name")
   stripeId     String    @unique @map("stripe_id")
   stripeStatus String    @map("stripe_status")

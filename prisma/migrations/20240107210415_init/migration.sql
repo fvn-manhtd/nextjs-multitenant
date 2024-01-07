@@ -26,6 +26,7 @@ CREATE TABLE "admins" (
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "status" BOOLEAN NOT NULL DEFAULT false,
+    "verified_at" TIMESTAMP(3),
     "created_at" TIMESTAMP(3),
     "updated_at" TIMESTAMP(3),
 
@@ -37,7 +38,6 @@ CREATE TABLE "admin_tokens" (
     "id" TEXT NOT NULL,
     "admin_id" TEXT NOT NULL,
     "token" TEXT NOT NULL,
-    "expire_at" TIMESTAMP(3) NOT NULL,
     "created_at" TIMESTAMP(3),
     "updated_at" TIMESTAMP(3),
 
