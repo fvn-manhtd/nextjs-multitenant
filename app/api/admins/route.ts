@@ -2,9 +2,9 @@ import prisma from "@/lib/database";
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { isAuthenticated } from "../auth";
-import crypto from "crypto";
 import { Validation } from "../validation";
 import { ApiResponse } from "../apiResponse";
+import { ulid } from "ulid";
 
 const SECRET_KEY = process.env.SECRET_KEY || "";
 
@@ -16,12 +16,12 @@ const SECRET_KEY = process.env.SECRET_KEY || "";
  */
 export async function GET(req: NextRequest) {
   if (!(await isAuthenticated(req))) {
-    return NextResponse.json(new ApiResponse("unauthenticated").toJson());
+    return ApiResponse.unAuthenticated();
   }
 
   const admins = await prisma.admins.findMany();
 
-  return NextResponse.json(new ApiResponse("ok", null, admins).toJson());
+  return ApiResponse.success(admins);
 }
 
 /**
@@ -35,26 +35,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   const { name, email, tenantId, password } = JSON.parse(body);
 
   // Validate input
-  const errors = [];
-  if (!Validation.validateEmail(email)) {
-    errors.push({ email: "Invalid email" });
-  }
-  if (!Validation.validateName(name)) {
-    errors.push({ name: "Invalid name" });
-  }
-  if (!Validation.validateTenantId(tenantId)) {
-    errors.push({ tenantId: "Invalid tenantId" });
-  }
-  if (!Validation.validatePassword(password)) {
-    errors.push({ password: "Invalid password" });
-  }
+  const errors = Validation.validateAll(name, email, tenantId, password);
 
   if (errors.length > 0) {
-    return NextResponse.json(new ApiResponse("error", errors).toJson());
+    return ApiResponse.error(errors);
   }
 
-  const salt = crypto.randomBytes(16).toString("hex");
-  const hashedPassword = Validation.hashPassword(password, salt);
+  const hashedPassword = Validation.hashPassword(password);
 
   /**
    * Creates a new admin in the database.
@@ -66,35 +53,33 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
    * @param {string} status - The status of the admin. default is false, need to active by email
    * @returns {Promise<Admin>} - The newly created admin object.
    */
-  const newAdmin = await prisma.admins.create({
-    data: {
-      name: name,
-      email: email,
-      tenantId: tenantId,
-      password: hashedPassword,
-      status: false,
-    },
-  });
+  try {
+    const newAdmin = await prisma.admins.create({
+      data: {
+        id: ulid(),
+        name,
+        email,
+        tenantId: tenantId,
+        password: hashedPassword,
+        status: false,
+      },
+    });
+    const token = jwt.sign({ tenantId, name, email }, SECRET_KEY, {
+      expiresIn: "1h",
+    });
 
-  const token = jwt.sign({ tenantId, name, email }, SECRET_KEY, {
-    expiresIn: "1h",
-  });
+    await prisma.adminTokens.create({
+      data: { id: ulid(), adminId: newAdmin.id, token },
+    });
 
-  /**
-   * Creates a new admin token in the database.
-   *
-   * @param {string} adminId - The name of the admin.
-   * @param {string} token - The email of the admin.
-   * @returns {Promise<AdminToken>} - The newly created admin object.
-   */
-  await prisma.adminTokens.create({
-    data: {
-      adminId: newAdmin.id,
-      token: token,
-    },
-  });
+    const temporayDomain = `${tenantId}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`;
+    await prisma.domains.create({
+      data: { id: ulid(), domain: temporayDomain, tenantId: tenantId },
+    });
 
-  return NextResponse.json(
-    new ApiResponse("ok", { admin: newAdmin, token: token }).toJson()
-  );
+    return ApiResponse.success({ admin: newAdmin, token: token });
+  } catch (error) {
+    console.error("Error creating admin:", error);
+    return ApiResponse.error("Error creating new tenant");
+  }
 }

@@ -10,28 +10,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Tenants {
-  id        String    @id @default(dbgenerated()) @map("id")
-  createdAt DateTime? @map("created_at")
-  updatedAt DateTime? @updatedAt @map("updated_at")
-
-  domains               Domains[]
-  admins                Admins[]
-  workingTimes          WorkingTimes[]
-  exceptionSettingTimes ExceptionSettingTimes[]
-  reservations          Reservations[]
-
-  @@map("tenants")
-}
-
 model Domains {
   id        String    @id @default(dbgenerated()) @map("id")
   domain    String    @unique @map("domain")
   tenantId  String    @map("tenant_id")
-  createdAt DateTime? @map("created_at")
+  createdAt DateTime? @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
-
-  tenant Tenants @relation(fields: [tenantId], references: [id])
+  
 
   @@map("domains")
 }
@@ -44,10 +29,9 @@ model Admins {
   password   String    @map("password")
   status     Boolean   @default(false) @map("status")
   verifiedAt DateTime? @map("verified_at")
-  createdAt  DateTime? @map("created_at")
+  createdAt  DateTime? @default(now()) @map("created_at")
   updatedAt  DateTime? @updatedAt @map("updated_at")
 
-  tenant        Tenants         @relation(fields: [tenantId], references: [id])
   adminTokens   AdminTokens[]
   adminProfiles AdminProfiles[]
 
@@ -58,7 +42,7 @@ model AdminTokens {
   id        String    @id @default(dbgenerated()) @map("id")
   adminId   String    @map("admin_id")
   token     String    @map("token")
-  createdAt DateTime? @map("created_at")
+  createdAt DateTime? @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
 
   admin Admins @relation(fields: [adminId], references: [id])
@@ -92,10 +76,10 @@ model WorkingTimes {
   startTime DateTime @map("start_time")
   endTime   DateTime @map("end_time")
 
-  createdAt DateTime? @map("created_at")
+  createdAt DateTime? @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
 
-  tenant Tenants @relation(fields: [tenantId], references: [id])
+
 
   @@map("working_times")
 }
@@ -104,10 +88,10 @@ model ExceptionSettingTimes {
   id        String    @id @default(dbgenerated()) @map("id")
   tenantId  String    @map("tenant_id")
   hours     Json      @map("hours")
-  createdAt DateTime? @map("created_at")
+  createdAt DateTime? @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
 
-  tenant Tenants @relation(fields: [tenantId], references: [id])
+
 
   @@map("exception_setting_times")
 }
@@ -131,7 +115,7 @@ model Reservations {
   createdAt   DateTime? @map("created_at")
   updatedAt   DateTime? @updatedAt @map("updated_at")
 
-  tenant   Tenants   @relation(fields: [tenantId], references: [id])
+
   timeSlot TimeSlots @relation(fields: [timeSlotId], references: [id])
 
   @@map("reservations")

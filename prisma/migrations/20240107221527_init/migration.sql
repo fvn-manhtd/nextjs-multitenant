@@ -1,18 +1,9 @@
 -- CreateTable
-CREATE TABLE "tenants" (
-    "id" TEXT NOT NULL,
-    "created_at" TIMESTAMP(3),
-    "updated_at" TIMESTAMP(3),
-
-    CONSTRAINT "tenants_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "domains" (
     "id" TEXT NOT NULL,
     "domain" TEXT NOT NULL,
     "tenant_id" TEXT NOT NULL,
-    "created_at" TIMESTAMP(3),
+    "created_at" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3),
 
     CONSTRAINT "domains_pkey" PRIMARY KEY ("id")
@@ -27,7 +18,7 @@ CREATE TABLE "admins" (
     "password" TEXT NOT NULL,
     "status" BOOLEAN NOT NULL DEFAULT false,
     "verified_at" TIMESTAMP(3),
-    "created_at" TIMESTAMP(3),
+    "created_at" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3),
 
     CONSTRAINT "admins_pkey" PRIMARY KEY ("id")
@@ -38,7 +29,7 @@ CREATE TABLE "admin_tokens" (
     "id" TEXT NOT NULL,
     "admin_id" TEXT NOT NULL,
     "token" TEXT NOT NULL,
-    "created_at" TIMESTAMP(3),
+    "created_at" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3),
 
     CONSTRAINT "admin_tokens_pkey" PRIMARY KEY ("id")
@@ -68,7 +59,7 @@ CREATE TABLE "working_times" (
     "tenant_id" TEXT NOT NULL,
     "start_time" TIMESTAMP(3) NOT NULL,
     "end_time" TIMESTAMP(3) NOT NULL,
-    "created_at" TIMESTAMP(3),
+    "created_at" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3),
 
     CONSTRAINT "working_times_pkey" PRIMARY KEY ("id")
@@ -79,7 +70,7 @@ CREATE TABLE "exception_setting_times" (
     "id" TEXT NOT NULL,
     "tenant_id" TEXT NOT NULL,
     "hours" JSONB NOT NULL,
-    "created_at" TIMESTAMP(3),
+    "created_at" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3),
 
     CONSTRAINT "exception_setting_times_pkey" PRIMARY KEY ("id")
@@ -158,25 +149,10 @@ CREATE UNIQUE INDEX "subscription_items_stripe_id_key" ON "subscription_items"("
 CREATE INDEX "subscription_items_subscription_id_stripe_price_unique" ON "subscription_items"("subscription_id", "stripe_price");
 
 -- AddForeignKey
-ALTER TABLE "domains" ADD CONSTRAINT "domains_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "tenants"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "admins" ADD CONSTRAINT "admins_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "tenants"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "admin_tokens" ADD CONSTRAINT "admin_tokens_admin_id_fkey" FOREIGN KEY ("admin_id") REFERENCES "admins"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "admin_profiles" ADD CONSTRAINT "admin_profiles_admin_id_fkey" FOREIGN KEY ("admin_id") REFERENCES "admins"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "working_times" ADD CONSTRAINT "working_times_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "tenants"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "exception_setting_times" ADD CONSTRAINT "exception_setting_times_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "tenants"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "reservations" ADD CONSTRAINT "reservations_tenant_id_fkey" FOREIGN KEY ("tenant_id") REFERENCES "tenants"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "reservations" ADD CONSTRAINT "reservations_time_slot_id_fkey" FOREIGN KEY ("time_slot_id") REFERENCES "time_slots"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
