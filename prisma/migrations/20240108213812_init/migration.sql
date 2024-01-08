@@ -134,6 +134,9 @@ CREATE TABLE "subscription_items" (
 CREATE UNIQUE INDEX "domains_domain_key" ON "domains"("domain");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "admins_tenant_id_key" ON "admins"("tenant_id");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "admins_email_key" ON "admins"("email");
 
 -- CreateIndex

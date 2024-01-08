@@ -12,7 +12,7 @@ export class Validation {
   }
 
   static validateTenantId(tenantId: string): boolean {
-    const tenantIdRegex = /^[a-zA-Z\- ]{1,40}$/;
+    const tenantIdRegex = /^[a-zA-Z0-9\- ]{1,40}$/;
     return tenantIdRegex.test(tenantId);
   }
 

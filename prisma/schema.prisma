@@ -23,7 +23,7 @@ model Domains {
 
 model Admins {
   id         String    @id @default(dbgenerated()) @map("id")
-  tenantId   String    @map("tenant_id")
+  tenantId   String    @unique @map("tenant_id")
   name       String    @map("name")
   email      String    @unique @map("email")
   password   String    @map("password")

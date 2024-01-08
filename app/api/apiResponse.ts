@@ -1,3 +1,8 @@
+import {
+  STATUS_ERROR,
+  STATUS_SUCCESS,
+  STATUS_UNAUTHENTICATED,
+} from "@/lib/contants";
 import { NextResponse } from "next/server";
 
 export class ApiResponse {
@@ -24,17 +29,17 @@ export class ApiResponse {
   }
 
   static error(message: any, data: any | null = null) {
-    const response = new ApiResponse("error", message, data);
+    const response = new ApiResponse(STATUS_ERROR, message, data);
     return response.toJson();
   }
 
   static success(data: any) {
-    const response = new ApiResponse("success", null, data);
+    const response = new ApiResponse(STATUS_SUCCESS, null, data);
     return response.toJson();
   }
 
   static unAuthenticated() {
-    const response = new ApiResponse("unauthenticated");
+    const response = new ApiResponse(STATUS_UNAUTHENTICATED);
     return response.toJson();
   }
 }
