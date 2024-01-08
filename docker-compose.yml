@@ -6,5 +6,30 @@ services:
     restart: always
     environment:
       POSTGRES_PASSWORD: example
+    volumes:
+      - db-data:/var/lib/postgresql/data
     ports:
       - 5432:5432
+    networks:
+      - web
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+  
+  mailpit:
+    image: 'axllent/mailpit:latest'
+    ports:
+        - '${FORWARD_MAILPIT_PORT:-1025}:1025'
+        - '${FORWARD_MAILPIT_DASHBOARD_PORT:-8025}:8025'
+    networks:
+        - web
+
+volumes:
+  db-data:
+    driver: local
+
+networks:
+  web:
+    driver: bridge
