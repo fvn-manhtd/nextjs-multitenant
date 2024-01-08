@@ -6,7 +6,6 @@ import { Validation } from "../validation";
 import { ApiResponse } from "../apiResponse";
 import { ulid } from "ulid";
 import { emailService } from "@/services/emailService";
-import { Admins } from "@prisma/client";
 
 const SECRET_KEY = process.env.SECRET_KEY || "";
 
@@ -45,16 +44,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
   const hashedPassword = Validation.hashPassword(password);
 
-  /**
-   * Creates a new admin in the database.
-   *
-   * @param {string} name - The name of the admin.
-   * @param {string} email - The email of the admin.
-   * @param {string} tenantId - The ID of the tenant the admin belongs to.
-   * @param {string} hashedPassword - The hashed password of the admin.
-   * @param {string} status - The status of the admin. default is false, need to active by email
-   * @returns {Promise<Admins>} - The newly created admin object.
-   */
   try {
     // Check for existing email and tenantId
     const existingEmail = await prisma.admins.findUnique({ where: { email } });
