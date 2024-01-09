@@ -152,9 +152,6 @@ CREATE UNIQUE INDEX "subscription_items_stripe_id_key" ON "subscription_items"("
 CREATE INDEX "subscription_items_subscription_id_stripe_price_unique" ON "subscription_items"("subscription_id", "stripe_price");
 
 -- AddForeignKey
-ALTER TABLE "admin_tokens" ADD CONSTRAINT "admin_tokens_admin_id_fkey" FOREIGN KEY ("admin_id") REFERENCES "admins"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "admin_profiles" ADD CONSTRAINT "admin_profiles_admin_id_fkey" FOREIGN KEY ("admin_id") REFERENCES "admins"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey

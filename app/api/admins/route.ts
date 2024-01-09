@@ -1,13 +1,11 @@
 import prisma from "@/lib/database";
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
-import { isAuthenticated } from "../auth";
-import { Validation } from "../validation";
-import { ApiResponse } from "../apiResponse";
 import { ulid } from "ulid";
 import { emailService } from "@/services/emailService";
-
-const SECRET_KEY = process.env.SECRET_KEY || "";
+import { ApiResponse } from "@/services/apiResponse";
+import { Validation } from "@/services/validation";
+import { SECRET_KEY } from "@/lib/contants";
 
 /**
  * Handles the GET request for retrieving a list of admins.
@@ -15,15 +13,15 @@ const SECRET_KEY = process.env.SECRET_KEY || "";
  * @param req - The NextRequest object representing the incoming request.
  * @returns A NextResponse object containing the list of admins in the response body.
  */
-export async function GET(req: NextRequest) {
-  if (!(await isAuthenticated(req))) {
-    return ApiResponse.unAuthenticated();
-  }
+// export async function GET(req: NextRequest) {
+//   if (!(await isAuthenticated(req))) {
+//     return ApiResponse.unAuthenticated();
+//   }
 
-  const admins = await prisma.admins.findMany();
+//   const admins = await prisma.admins.findMany();
 
-  return ApiResponse.success(admins);
-}
+//   return ApiResponse.success(admins);
+// }
 
 /**
  * Handles the POST request to create a new admin.
@@ -57,11 +55,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       return ApiResponse.error("Subdomain already exists");
     }
 
-    // Create a new token
-    let token = jwt.sign({ tenantId, name, email }, SECRET_KEY, {
-      expiresIn: "1h",
-    });
-
     // Create a new admin
     let newAdmin;
     try {
@@ -79,15 +72,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       return ApiResponse.error("Error creating admin token");
     }
 
-    // Create a new admin token
-    try {
-      await prisma.adminTokens.create({
-        data: { id: ulid(), adminId: newAdmin.id, token },
-      });
-    } catch (error) {
-      return ApiResponse.error("Error creating admin token");
-    }
-
     // Create a temporary domain
     try {
       const temporayDomain = `${tenantId}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`;
@@ -100,12 +84,16 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     // Send verification email
     try {
+      // Create a new token
+      const token = jwt.sign({ tenantId, name, email }, SECRET_KEY, {
+        expiresIn: "1h",
+      });
       await emailService.sendVerificationEmail(email, token);
     } catch (error) {
       return ApiResponse.error("Error sending email");
     }
 
-    return ApiResponse.success({ admin: newAdmin, token: token });
+    return ApiResponse.success({ admin: newAdmin });
   } catch (error) {
     console.error("Error creating admin:", error);
     return ApiResponse.error("Error creating new tenant");

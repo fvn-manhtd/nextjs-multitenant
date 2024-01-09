@@ -31,8 +31,7 @@ model Admins {
   verifiedAt DateTime? @map("verified_at")
   createdAt  DateTime? @default(now()) @map("created_at")
   updatedAt  DateTime? @updatedAt @map("updated_at")
-
-  adminTokens   AdminTokens[]
+  
   adminProfiles AdminProfiles[]
 
   @@map("admins")
@@ -43,9 +42,7 @@ model AdminTokens {
   adminId   String    @map("admin_id")
   token     String    @map("token")
   createdAt DateTime? @default(now()) @map("created_at")
-  updatedAt DateTime? @updatedAt @map("updated_at")
-
-  admin Admins @relation(fields: [adminId], references: [id])
+  updatedAt DateTime? @updatedAt @map("updated_at")  
 
   @@map("admin_tokens")
 }

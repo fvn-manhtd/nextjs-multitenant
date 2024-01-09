@@ -1,3 +1,4 @@
+import { SALT } from "@/lib/contants";
 import crypto from "crypto";
 
 export class Validation {
@@ -22,10 +23,21 @@ export class Validation {
   }
 
   static hashPassword(password: string): string {
-    const salt = crypto.randomBytes(16).toString("hex");
     return crypto
-      .pbkdf2Sync(password, salt, 1000, 64, `sha512`)
+      .pbkdf2Sync(password, SALT, 1000, 64, `sha512`)
       .toString(`hex`);
+  }
+  static compareHashedPassword(
+    password: string,
+    hashedPassword: string
+  ): boolean {
+    const hashedInputPassword = crypto
+      .pbkdf2Sync(password, SALT, 1000, 64, `sha512`)
+      .toString(`hex`);
+    return crypto.timingSafeEqual(
+      Buffer.from(hashedInputPassword),
+      Buffer.from(hashedPassword)
+    );
   }
 
   static validateAll(
