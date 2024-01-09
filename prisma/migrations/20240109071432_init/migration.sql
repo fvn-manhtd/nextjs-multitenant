@@ -2,6 +2,10 @@
 CREATE TABLE "domains" (
     "id" TEXT NOT NULL,
     "domain" TEXT NOT NULL,
+    "name" TEXT,
+    "description" TEXT,
+    "logo" TEXT,
+    "image" TEXT,
     "tenant_id" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3),
@@ -40,7 +44,6 @@ CREATE TABLE "admin_profiles" (
     "id" TEXT NOT NULL,
     "admin_id" TEXT NOT NULL,
     "company_name" TEXT NOT NULL,
-    "logo" TEXT NOT NULL,
     "website" TEXT NOT NULL,
     "prefecture" TEXT NOT NULL,
     "address1" TEXT NOT NULL,

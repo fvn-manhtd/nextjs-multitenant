@@ -1,16 +1,17 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link"
-import { useParams } from "next/navigation"
+import { useParams } from "next/navigation";
 
-export default function Component() {
 
-  const params = useParams();
-  const tenant = params.subdomain;
-  console.log(tenant)
+const HomePage = () => {
+
+  const params = useParams();  
+  const domain = params.domain;
+  
 
   return (
+    
     <div className="flex flex-col min-h-screen">
       <header className="px-4 lg:px-6 h-14 flex items-center justify-between">
         <Link className="flex items-center" href="#">
@@ -30,7 +31,7 @@ export default function Component() {
             <path d="M3 6h18" />
             <path d="M16 10a4 4 0 0 1-8 0" />
           </svg>
-          <span className="sr-only">Welcome to {tenant}</span>
+          <span className="sr-only">Welcome to {domain}</span>
         </Link>
         <nav className="flex gap-4 sm:gap-6">
           <Link className="text-sm font-medium hover:underline underline-offset-4" href="#">
@@ -49,7 +50,7 @@ export default function Component() {
       </header>
       <main className="flex-1">
         <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-900 text-center">
-          <h1 className="text-4xl font-bold mb-4">Welcome to {tenant}</h1>
+          <h1 className="text-4xl font-bold mb-4">Welcome to {domain}</h1>
           <p className="text-xl text-gray-600 dark:text-gray-400 mb-8">
             The best place for your online shopping needs.
           </p>
@@ -70,5 +71,8 @@ export default function Component() {
         </nav>
       </footer>
     </div>
+    
   )
 }
+
+export default HomePage

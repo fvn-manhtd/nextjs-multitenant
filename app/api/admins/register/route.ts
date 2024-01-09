@@ -6,23 +6,6 @@ import { emailService } from "@/services/emailService";
 import { ApiResponse } from "@/services/apiResponse";
 import { Validation } from "@/services/validation";
 import { SECRET_KEY } from "@/lib/contants";
-import { isAuthenticated } from "@/services/auth";
-
-/**
- * Handles the GET request for retrieving a list of admins.
- *
- * @param req - The NextRequest object representing the incoming request.
- * @returns A NextResponse object containing the list of admins in the response body.
- */
-export async function GET(req: NextRequest) {
-  if (!(await isAuthenticated(req))) {
-    return ApiResponse.unAuthenticated();
-  }
-
-  const admins = await prisma.admins.findMany();
-
-  return ApiResponse.success(admins);
-}
 
 /**
  * Handles the POST request to create a new admin.
