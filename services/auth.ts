@@ -8,7 +8,6 @@ export async function isAuthenticated(req: NextRequest): Promise<boolean> {
   if (token) {
     try {
       const decoded = jwt.verify(token, SECRET_KEY) as JwtPayload;
-      console.log("decoded", decoded);
       const admin = await prisma.admins.findFirst({
         where: {
           email: decoded.email,
@@ -17,6 +16,11 @@ export async function isAuthenticated(req: NextRequest): Promise<boolean> {
       });
       return admin ? true : false;
     } catch (err) {
+      if (err instanceof jwt.TokenExpiredError) {
+        console.log("Token is expired");
+      } else {
+        console.log("Token is invalid");
+      }
       return false;
     }
   }

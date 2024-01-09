@@ -2,10 +2,11 @@ version: '3.1'
 
 services:
   db:
-    image: postgres
+    image: postgres    
     restart: always
     environment:
       POSTGRES_PASSWORD: example
+      TZ: Asia/Tokyo
     volumes:
       - db-data:/var/lib/postgresql/data
     ports:
