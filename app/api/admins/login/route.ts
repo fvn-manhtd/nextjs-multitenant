@@ -4,8 +4,9 @@ import jwt from "jsonwebtoken";
 import { ulid } from "ulid";
 import { ApiResponse } from "@/services/apiResponse";
 import { Validation } from "@/services/validation";
-import { SALT, SECRET_KEY } from "@/lib/contants";
-import { Admins } from "@prisma/client";
+import { COOKIE_NAME, SECRET_KEY } from "@/lib/contants";
+import { cookies } from "next/headers";
+import { isHostExist } from "@/services/auth";
 
 /**
  * Handles the POST request to create a new admin.
@@ -14,6 +15,11 @@ import { Admins } from "@prisma/client";
  * @returns {Promise<NextResponse>} - The NextResponse object representing the response.
  */
 export async function POST(req: NextRequest): Promise<NextResponse> {
+  const hostExists = await isHostExist(req);
+  if (!hostExists) {
+    return ApiResponse.error("Domain does not exist", 404);
+  }
+
   const body = await new Response(req.body).text();
   const { email, password } = JSON.parse(body);
 
@@ -22,15 +28,18 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       email: email,
     },
   });
+  if (admin?.tenantId !== hostExists?.tenantId) {
+    return ApiResponse.error("Admin does not exist", 404);
+  }
 
   // check if admin exists
   if (!admin || !admin.status || !admin.verifiedAt) {
-    return ApiResponse.error("Admin not found");
+    return ApiResponse.error("Admin not found", 404);
   }
   const { password: passwordAdmin, ...adminWithoutPassword } = admin;
   const isPassword = Validation.compareHashedPassword(password, passwordAdmin);
   if (!isPassword) {
-    return ApiResponse.error("Password is wrong");
+    return ApiResponse.error("Password is wrong", 422);
   }
 
   const token = jwt.sign({ tenantId: admin.tenantId, email }, SECRET_KEY, {
@@ -43,8 +52,15 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       data: { id: ulid(), adminId: admin.id, token },
     });
   } catch (error) {
-    return ApiResponse.error("Error creating admin token");
+    return ApiResponse.error("Error creating admin token", 400);
   }
+
+  cookies().set({
+    name: COOKIE_NAME,
+    value: token,
+    httpOnly: true,
+    path: "/",
+  });
 
   return ApiResponse.success({ admin: adminWithoutPassword, token: token });
 }

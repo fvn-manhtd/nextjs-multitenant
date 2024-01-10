@@ -4,6 +4,9 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation';
 import React from 'react';
 import { ReactNode } from 'react';
+import { useRouter } from 'next/router';
+import { Toaster } from 'sonner';
+
 
 
 
@@ -69,8 +72,7 @@ export default async function SiteLayout({
 
 
   const domain = decodeURIComponent(params.domain);
-  const data = await getSiteData(domain);
-  
+  const data = await getSiteData(domain);  
 
   if (!data) {
     notFound();
@@ -80,6 +82,7 @@ export default async function SiteLayout({
     <html lang="en">
       <body>           
         {children}   
+        <Toaster />
       </body>
     </html>
   )
