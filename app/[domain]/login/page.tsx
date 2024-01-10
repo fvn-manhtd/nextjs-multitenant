@@ -30,7 +30,7 @@ const LoginPage = () => {
     if(data.status === "success"){
       router.push("/console");      
     } else {
-      toast.error(data.message)  
+      toast.error(data.message ? data.message : "Something went wrong")  
     } 
   };
 
