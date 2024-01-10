@@ -32,4 +32,6 @@ export async function GET(req: NextRequest) {
       return ApiResponse.error("No admin found");
     }
   }
+  // Add a return statement here to handle the case where there is no token
+  return ApiResponse.error("No authorization token provided");
 }

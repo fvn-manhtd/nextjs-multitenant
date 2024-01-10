@@ -1,5 +1,6 @@
 "use client";
 
+import ProtectedComponent from "@/components/protected-component";
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -33,7 +34,7 @@ const ConsolePage = () => {
   
 
   return (
-    
+    <ProtectedComponent domain={domain}>
     <div className="flex flex-col min-h-screen">
       <header className="px-4 lg:px-6 h-14 flex items-center justify-between">
         <Link className="flex items-center" href="#">
@@ -93,7 +94,7 @@ const ConsolePage = () => {
         </nav>
       </footer>
     </div>
-    
+    </ProtectedComponent>
   )
 }
 

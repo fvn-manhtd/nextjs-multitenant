@@ -52,7 +52,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   }
 
   const token = jwt.sign({ tenantId: admin.tenantId, email }, SECRET_KEY, {
-    expiresIn: "1h",
+    expiresIn: "10s",
   });
 
   // Create a new admin token
