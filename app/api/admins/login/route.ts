@@ -29,17 +29,26 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     },
   });
   if (admin?.tenantId !== hostExists?.tenantId) {
-    return ApiResponse.error("Admin does not exist", 404);
+    return ApiResponse.error(
+      "Account does not exist. Please check email, password again",
+      404
+    );
   }
 
   // check if admin exists
   if (!admin || !admin.status || !admin.verifiedAt) {
-    return ApiResponse.error("Admin not found", 404);
+    return ApiResponse.error(
+      "Account does not exist. Please check email, password again",
+      404
+    );
   }
   const { password: passwordAdmin, ...adminWithoutPassword } = admin;
   const isPassword = Validation.compareHashedPassword(password, passwordAdmin);
   if (!isPassword) {
-    return ApiResponse.error("Password is wrong", 422);
+    return ApiResponse.error(
+      "Account does not exist. Please check email, password again",
+      404
+    );
   }
 
   const token = jwt.sign({ tenantId: admin.tenantId, email }, SECRET_KEY, {
@@ -52,7 +61,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       data: { id: ulid(), adminId: admin.id, token },
     });
   } catch (error) {
-    return ApiResponse.error("Error creating admin token", 400);
+    return ApiResponse.error("Error login", 400);
   }
 
   cookies().set({
